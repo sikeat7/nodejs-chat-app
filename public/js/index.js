@@ -45,12 +45,10 @@ locationButton.on('click', function () {
     console.log('Location is sending..');
 
     navigator.geolocation.getCurrentPosition(function (position) {
-        console.log(position);
         socket.emit('createLocationMessage', {
             latitude: position.coords.latitude,
             longtitude: position.coords.longitude
         });
-        console.log('Location fetched')
     }, function () {
         alert('Unable to fetch location');
     });
