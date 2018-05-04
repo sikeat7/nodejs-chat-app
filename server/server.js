@@ -18,6 +18,12 @@ app.use(express.static(publicPath));
 io.on('connection', (socket) => {
     console.log('New User Connected');
 
+    // Get Rooms to user can make a login with
+    socket.on('getRoomConnect', () => {
+        var roomList = users.getRoomList();
+        io.emit('updateRoomList', roomList);
+    });
+
     socket.on('join', (params, callback) => {
         if (!isRealString(params.name) || !isRealString(params.room)) {
             callback('Name and Room are required.');

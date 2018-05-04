@@ -21,10 +21,63 @@
                 <label>Room Name</label>
                 <input type="text" name="room" autofocus>
             </div>
+
             <div class="form-field">
-                <button>Join</button>
+                <label>Room List</label>
+                <select id="roomList">
+                    <!-- <option value="0">-- Choose Rooms --</option>
+                    <option value="1">Dota 2</option>
+                    <option value="2">Node JS Course</option> -->
+                </select>
+            </div>
+        
+            <div class="form-field">
+                <button id="enterRoom">Join</button>
             </div>
         </form>
     </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/libs/jquery-3.3.1.min.js"></script>
+    <script src="/js/libs/moment.js"></script>
+    <script src="/js/libs/mustache.js"></script>
+    <script src="/js/libs/deparam.js"></script>
+    <script>
+        var socket = io();
+
+        socket.on('connect', function () {
+            socket.emit('getRoomConnect', function (err) {
+                if (err) {
+                    console.log('No Room Found!');
+                } else {
+                    console.log('Room was found');
+                }
+            });
+        });
+
+        socket.on('updateRoomList', function (rooms) { 
+            var select = jQuery('#roomList').empty().append(jQuery('<option>', {value:0, text:'-- Choose Rooms --'}));
+            rooms.forEach(function (room) {
+                select.append(jQuery('<option>', {value:room.room, text:room.room}));
+            });
+
+            //jQuery('#roomList').html(selectol);
+        });
+
+        jQuery('#enterRoom').on('click',function() {
+            var name = jQuery('[name=name]').val();
+            var room = jQuery('[name=room]').val();
+            var exitRoom = jQuery('#roomList option').length;
+            console.log(room);
+            if (!name) alert('Please enter your Name'); return false;
+            if(!room && exitRoom == 1) alert('Please enter room or choose the rooms!'); return false;
+            // if (exitRoom != 1) {
+            //     var params = jQuery.deparam(window.location.search);
+            //     window.location.href = '/';
+            // }
+            return false;
+
+        });
+    </script>
 </body>
 </html>
