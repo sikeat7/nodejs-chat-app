@@ -9,14 +9,14 @@ class Users {
         this.rooms = [];
     }
     addUser (id, name, room) {
-        var user = {id, name, room};
-        this.users.push(user);
         if (id && name && room){
+            var user = {id, name, room};
+            this.users.push(user);
             if (!this.getRoom(room)) {
                 this.rooms.push({room});
             }
+            return user;
         }
-        return user;
     }
     removeUser (id) {
         var user = this.getUser(id);

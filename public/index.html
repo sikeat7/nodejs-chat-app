@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,30 +8,31 @@
     <title>Join | Chat App</title>
     <link rel="stylesheet" type="text/css" media="screen" href="/css/styles.css" />
 </head>
+
 <body class="centered-form">
     <div class="centered-form__form">
-        <form action="/chat.html">
+        <form id="form-action" action="/chat.html">
             <div class="form-field">
                 <h3>Join a Chat</h3>
             </div>
             <div class="form-field">
                 <label>Display Name</label>
-                <input type="text" name="name" autofocus>
+                <input type="text" id="name" name="name" autofocus>
             </div>
-            <div class="form-field">
+            <div class="form-field" id="roomName" style="display:none;">
                 <label>Room Name</label>
-                <input type="text" name="room" autofocus>
+                <input type="text" id="room" name="room" autofocus>
+            </div>
+
+            <div class="form-field" id="showRoom">
+                <label>Room List</label>
+                <select id="roomList" name="room"></select>
             </div>
 
             <div class="form-field">
-                <label>Room List</label>
-                <select id="roomList">
-                    <!-- <option value="0">-- Choose Rooms --</option>
-                    <option value="1">Dota 2</option>
-                    <option value="2">Node JS Course</option> -->
-                </select>
+                <label><input type="checkbox" id="createNewRoom"> Create New Room</label>
             </div>
-        
+
             <div class="form-field">
                 <button id="enterRoom">Join</button>
             </div>
@@ -43,6 +45,26 @@
     <script src="/js/libs/mustache.js"></script>
     <script src="/js/libs/deparam.js"></script>
     <script>
+        jQuery(document).ready(function() {
+            jQuery('#room').prop('disabled', true);
+            jQuery('#roomList').prop('disabled', false);
+            jQuery('#roomName').hide().fadeOut();
+            jQuery('#showRoom').show().fadeIn();
+            jQuery('#createNewRoom').on('change', function (){
+                var createRoom = jQuery(this).is(':checked');
+                if (createRoom) {
+                    jQuery('#room').prop('disabled', false);
+                    jQuery('#roomList').prop('disabled', true);
+                    jQuery('#roomName').show().fadeIn();
+                    jQuery('#showRoom').hide().fadeOut();
+                } else {
+                    jQuery('#room').prop('disabled', true);
+                    jQuery('#roomList').prop('disabled', false);
+                    jQuery('#roomName').hide().fadeOut();
+                    jQuery('#showRoom').show().fadeIn();
+                }
+            });
+        });
         var socket = io();
 
         socket.on('connect', function () {
@@ -55,29 +77,39 @@
             });
         });
 
-        socket.on('updateRoomList', function (rooms) { 
-            var select = jQuery('#roomList').empty().append(jQuery('<option>', {value:0, text:'-- Choose Rooms --'}));
+        socket.on('updateRoomList', function (rooms) {
+            var select = jQuery('#roomList').empty().append(jQuery('<option>', {
+                value: '',
+                text: '-- Choose Rooms --'
+            }));
             rooms.forEach(function (room) {
-                select.append(jQuery('<option>', {value:room.room, text:room.room}));
+                select.append(jQuery('<option>', {
+                    value: room.room,
+                    text: room.room
+                }));
             });
 
             //jQuery('#roomList').html(selectol);
         });
 
-        jQuery('#enterRoom').on('click',function() {
-            var name = jQuery('[name=name]').val();
-            var room = jQuery('[name=room]').val();
-            var exitRoom = jQuery('#roomList option').length;
-            console.log(room);
-            if (!name) alert('Please enter your Name'); return false;
-            if(!room && exitRoom == 1) alert('Please enter room or choose the rooms!'); return false;
-            // if (exitRoom != 1) {
-            //     var params = jQuery.deparam(window.location.search);
-            //     window.location.href = '/';
-            // }
-            return false;
+        jQuery('#enterRoom').on('click', function () {
+            var name = jQuery('#name').val();
+            var createRoom = jQuery('#createNewRoom').is(':checked');
+            var roomList = jQuery('#roomList option:selected').val();
+            var room = jQuery('#room').val();
+            if (!createRoom) {
+                room = roomList;
+            }
 
+            if (!name) {
+                alert('Please enter your Name');
+                return false;
+            } else if (!room) {
+                alert('Please enter room.');
+                return false;
+            }
         });
     </script>
 </body>
+
 </html>
